@@ -1,0 +1,83 @@
+package StepDefinitions;
+
+import java.time.Duration;
+
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
+import org.testng.Assert;
+
+import PageObject.LoginPage;
+import io.cucumber.java.en.Given;
+import io.cucumber.java.en.Then;
+import io.cucumber.java.en.When;
+
+public class StepDef {
+
+    WebDriver driver;
+    LoginPage loginpage;
+    WebDriverWait wait;
+
+    @Given("User Launch Chrome browser")
+    public void user_launch_chrome_browser() {
+
+        ChromeOptions options = new ChromeOptions();
+
+        // Anti-detection
+        options.addArguments("--disable-blink-features=AutomationControlled");
+        options.addArguments("--start-maximized");
+        options.addArguments("--disable-infobars");
+        options.addArguments("--disable-notifications");
+        options.setExperimentalOption("excludeSwitches", new String[]{"enable-automation"});
+        options.setExperimentalOption("useAutomationExtension", false);
+
+        // Launch driver
+        driver = new ChromeDriver(options);
+
+        wait = new WebDriverWait(driver, Duration.ofSeconds(15));
+
+        loginpage = new LoginPage(driver);
+    }
+
+    @When("User opens URL {string}")
+    public void user_opens_url(String url) {
+        driver.get(url);
+    }
+
+    @When("User enters Email as {string} and Password as {string}")
+    public void user_enters_email_and_password(String email, String password) {
+        wait.until(ExpectedConditions.visibilityOf(loginpage.email));
+        loginpage.enterEmail(email);
+
+        wait.until(ExpectedConditions.visibilityOf(loginpage.password));
+        loginpage.enterPassword(password);
+    }
+
+    @When("Click on Login")
+    public void click_on_login() {
+        wait.until(ExpectedConditions.elementToBeClickable(loginpage.LoginBtn));
+        loginpage.clickOnLoginButton();
+    }
+
+    @Then("Page Title should be {string}")
+    public void page_title_should_be(String expectedTitle) {
+
+        wait.until(ExpectedConditions.titleContains(expectedTitle.split(" ")[0])); // Partial match
+
+        String actualTitle = driver.getTitle();
+        Assert.assertEquals(actualTitle, expectedTitle, "❌ Page title mismatch!");
+    }
+
+    @When("User click on Log out link")
+    public void user_click_on_log_out_link() {
+        wait.until(ExpectedConditions.elementToBeClickable(loginpage.logout));
+        loginpage.clickOnLogOutButton();
+    }
+
+    @Then("close browser")
+    public void close_browser() {
+        driver.quit();
+    }
+}
