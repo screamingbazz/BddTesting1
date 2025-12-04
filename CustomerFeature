@@ -1,0 +1,16 @@
+
+Feature: Customers
+Scenario: Add New customer
+Given User Launch Chrome Browser
+ When User open URL "https://admin-demo.nopcommerce.com/admin/"
+ #And User enters username as "Admin" and Password as "admin123"
+ #And Click on Login
+ Then User can view dashboard
+ When User Click on customers menu
+ And  Click on customers menu item
+ And Click on add new button
+ Then User can view add new customer page
+ When user enters customer info
+ And Click on save button
+ Then User can view confirmation Page "The New Customer had benn added successfully"
+ And Close browser
